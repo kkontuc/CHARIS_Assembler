@@ -12,7 +12,7 @@ cnvDec2Bin(){
 	local dec=$1 ; local bits=$2		#the decimal to convert and the number of bits
 	[ -z "$dec" ] && dec=0
 	local bin=$(printf "%0.${bits}d\n" $(echo "ibase=10;obase=2;$(((2**(bits))+$dec))" | bc) )
-	bin=$(echo $bin | grep -oE "[[:digit:]]{$bits}$")			# HERE 
+	bin=$(echo $bin | grep -oE "[[:digit:]]{$bits}$")
 	echo $bin
 }
 cnvHex2Bin(){
