@@ -1,0 +1,29 @@
+addi r5, r0, 8
+ori r3, r0, 0xABCD
+sw r3, 4(r0) 
+lw r10, -4(r5) 
+lb r16, 4(r0) 
+nand r4, r10, r16
+b 0x2
+
+
+bne r5, r5, 0x8 
+lui r5, 0xffff
+li r3, 0xffff 
+nandi r3, 0xffff  
+beq r3, r5, 0x2  
+
+
+rol r5 
+sb r10, 0x0 
+ror r5 
+srl r5 
+sll r5 
+sra r5 
+nor r10, r3, r5 
+not r3, r3 
+sll r5 
+or r10, r3, r5 
+and r10, r3, r5 
+add r10, r3, r5 
+sub r10, r3, r5
