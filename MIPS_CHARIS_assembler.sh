@@ -6,8 +6,6 @@
 
 cd $(dirname ${0}) # makes sure we run it from its path
 
-#source ~/SKYNET_scripts/0.4.DLL/shell/ # Contains frequently used source code
-
 cnvDec2Bin(){
 	local dec=$1 ; local bits=$2		#the decimal to convert and the number of bits
 	[ -z "$dec" ] && dec=0
