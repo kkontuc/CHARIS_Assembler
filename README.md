@@ -1,4 +1,4 @@
-# CHARIS (**CHA**nia **R**isc **I**nstruction **S**et) Assembler
+# CHARIS (CHAnia Risc Instruction Set) Assembler
 
 The **MIPS_CHARIS_assembler.sh** is a shell script, written to assemble MIPS instructions to object code. CHARIS is a processor, designed and implemented as project of the "ACE312 - Computer Organization", summer semester course, Technical University of Crete. It is an implementation of a subset from the MIPS instruction set.
 
