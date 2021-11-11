@@ -6,7 +6,7 @@ The **MIPS_CHARIS_assembler.sh** is a shell script, written to assemble MIPS ins
 The bash code is provided with a test file - test.mipsasbl. You can run it on linux shell with:
 ``` 
 ./MIPS_CHARIS_assembler.sh test.mipsasm
-
+```
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 Έφτιαξα αυτό το προγραμματάκι σε bash προς διευκόλυνσή μου, στις περιπτώσεις που ήθελα να παράγω πηγαίο δυαδικό κώδικα για τον CHARIS.
