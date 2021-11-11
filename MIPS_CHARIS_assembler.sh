@@ -10,6 +10,7 @@ cd $(dirname ${0}) # makes sure we run it from its path
 
 cnvDec2Bin(){
 	local dec=$1 ; local bits=$2		#the decimal to convert and the number of bits
+	[ -z "$dec" ] && dec=0
 	local bin=$(printf "%0.${bits}d\n" $(echo "ibase=10;obase=2;$(((2**(bits))+$dec))" | bc) )
 	bin=$(echo $bin | grep -oE "[[:digit:]]{$bits}$")
 	echo $bin
@@ -74,7 +75,7 @@ getRItypeRd(){					# Returns Rd register in binary
 	commonSyntx
 	tmpR=$(echo $instr | grep -oE "^[[:space:]]*${INSTRS_NAMES}[[:space:]]+${Reg_syntax}" | grep -oE "${Reg_syntax}")
 	tmpR=$(echo $tmpR | grep -oE "[[:digit:]]+")
-	tmpR=$(cnvDec2Bin $tmpR 5)
+	tmpR=$(cnvDec2Bin "$tmpR" 5)
 	if echo $instr | grep -qE "^B[[:space:]]+";
 	then
 		((${#tmpR}==0)) && tmpR="00000"
@@ -94,7 +95,7 @@ getRItypeRt(){					# Returns Rt register in binary
 	fi
 	tmpR=$(echo $instr | grep -oE "${Reg_syntax}[[:space:]]*$" | grep -oE "${Reg_syntax}")
 	tmpR=$(echo $tmpR | grep -oE "[[:digit:]]+")
-	tmpR=$(cnvDec2Bin $tmpR 5)
+	tmpR=$(cnvDec2Bin "$tmpR" 5)
 	if echo $instr | grep -qE "^B[[:space:]]+";
 	then
 		((${#tmpR}==0)) && tmpR="00000"
@@ -121,17 +122,17 @@ getRItypeRs(){					# Returns Rd register in binary
 		then
 			tmpR=$(echo $instr | grep -oE "${MEMref_syntax}" | grep -oE "${Reg_syntax}")
 			tmpR=$(echo $tmpR | grep -oE "[[:digit:]]+")
-			tmpR=$(cnvDec2Bin $tmpR 5)
+			tmpR=$(cnvDec2Bin "$tmpR" 5)
 		else
 			tmpR=$(echo $instr | grep -oE "^[[:space:]]*${INSTRS_NAMES}[[:space:]]+${Reg_syntax}${Comma_syntax}${Reg_syntax}" | grep -oE "${Reg_syntax}$")
 			tmpR=$(echo $tmpR | grep -oE "[[:digit:]]+")
-			tmpR=$(cnvDec2Bin $tmpR 5)
+			tmpR=$(cnvDec2Bin "$tmpR" 5)
 		fi
 	elif ((NOO==3));
 	then
 		tmpR=$(echo $instr | grep -oE "^[[:space:]]*${INSTRS_NAMES}[[:space:]]+${Reg_syntax}${Comma_syntax}${Reg_syntax}" | grep -oE "${Reg_syntax}$")
 		tmpR=$(echo $tmpR | grep -oE "[[:digit:]]+")
-		tmpR=$(cnvDec2Bin $tmpR 5)
+		tmpR=$(cnvDec2Bin "$tmpR" 5)
 
 	fi
 	if echo $instr | grep -qE "^B[[:space:]]+";
@@ -148,11 +149,11 @@ getImmed(){
 	if echo $instr | grep -qE "${MEMref_syntax}";
 	then
 		tmpR=$(echo $instr | grep -oE "[+-]?[[:digit:]]{1,4}\(" | grep -oE "[-+]?[[:digit:]]+")
-		tmpR=$(cnvDec2Bin $tmpR 16)
+		tmpR=$(cnvDec2Bin "$tmpR" 16)
 	else
 		tmpR=$(echo $instr | grep -oE "${HEX_syntax}[[:space:]]*$" | grep -oE "${HEX_syntax}")
 		tmpR=$(echo $tmpR | grep -oE "[[:digit:]ABCDEF]{1,4}$")
-		tmpR=$(cnvHex2Bin $tmpR 16)
+		tmpR=$(cnvHex2Bin "$tmpR" 16)
 	fi
 
 	echo $tmpR
