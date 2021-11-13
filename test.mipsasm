@@ -18,7 +18,7 @@ rol r5
 sb r10, 0x0 
 ror r5 
 srl r5 
-sll r5 
+sll r7 
 sra r5 
 nor r10, r3, r5 
 not r3, r3 
