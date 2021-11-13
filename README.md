@@ -7,6 +7,16 @@ The bash code is provided with a test file - _"test.mipsasbl"_. You can run it o
 ``` 
 ./MIPS_CHARIS_assembler.sh test.mipsasm
 ```
+Both assembly and the corresponding object code, are printed colorcoded. The assembly code is printed in file descriptor 2. You can print only the object code with:
+
+``` 
+./MIPS_CHARIS_assembler.sh test.mipsasm 2>/dev/null
+```
+You can also, print both and save object code to a file:
+
+``` 
+./MIPS_CHARIS_assembler.sh test.mipsasm  | tee tmp; cat tmp | sed 's/\x1b\[[0-9;]*m//g' > obj.txt
+```
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 Έφτιαξα αυτό το προγραμματάκι σε bash προς διευκόλυνσή μου, στις περιπτώσεις που ήθελα να παράγω πηγαίο δυαδικό κώδικα για τον CHARIS.
