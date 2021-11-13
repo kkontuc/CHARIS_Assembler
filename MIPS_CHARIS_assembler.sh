@@ -29,11 +29,11 @@ getINSTRidx(){
 }
 
 commonSyntx(){
-	INSTRS_NAMES="(ADD|SUB|AND|OR|NOT|NAND|NOR|SRA|SRL|SLL|ROL|ROR|LI|LUI|ADDI|NANDI|ORI|B|BEQ|BNE|LB|SB|LW|SW)"
-	Comma_syntax='[[:space:]]*,[[:space:]]*'			# "R0, R1", "R0 ,R1", "R0 , R1"
-	Reg_syntax='R([[:digit:]]|[12][[:digit:]]|3[01])'		# R0-R31
-	HEX_syntax='(0X)?[[:digit:]ABCDEF]{1,4}'			# 0XFFFF, FFFF, f, 000f
-	MEMref_syntax="[+-]?[[:digit:]]{1,4}\($Reg_syntax\)"		# -4(R0), 4(R0), 0X0F
+	declare -g INSTRS_NAMES="(ADD|SUB|AND|OR|NOT|NAND|NOR|SRA|SRL|SLL|ROL|ROR|LI|LUI|ADDI|NANDI|ORI|B|BEQ|BNE|LB|SB|LW|SW)"
+	declare -g Comma_syntax='[[:space:]]*,[[:space:]]*'			# "R0, R1", "R0 ,R1", "R0 , R1"
+	declare -g Reg_syntax='R([[:digit:]]|[12][[:digit:]]|3[01])'		# R0-R31
+	declare -g HEX_syntax='(0X)?[[:digit:]ABCDEF]{1,4}'			# 0XFFFF, FFFF, f, 000f
+	declare -g MEMref_syntax="[+-]?[[:digit:]]{1,4}\($Reg_syntax\)"		# -4(R0), 4(R0), 0X0F
 }
 chkRsyntx(){
 	local instr="$1"
@@ -163,6 +163,14 @@ inErr="*INPUT ERROR* : MIPS_CHARIS_assembler.sh <CHARIS assembly instructions>"
 [ ! -f "$1" ] && echo $inErr && exit 1 # Invalid input error
 asblFile="$1"
 
+#Color coding
+clRed='\x1b[38;5;1m'		# Red color
+clGrn='\x1b[38;5;14m'		# Green color
+clOrn='\x1b[38;5;202m'		# Orange color
+clBlu='\x1b[38;5;33m'		# Blue color
+clYel='\x1b[38;5;227m'		# Yellow color
+clEND='\x1b[0m'
+
 #All CHARIS's Instructions and their corresponding opcodes, function codes and types.
 INSTRs_ASBL=('ADD' 'SUB' 'AND' 'OR' 'NOT' 'NAND' 'NOR' 'SRA' 'SRL' 'SLL' 'ROL' 'ROR' 'LI' 'LUI' 'ADDI' 'NANDI' 'ORI' 'B' 'BEQ' 'BNE' 'LB' 'SB' 'LW' 'SW')
 INSTRs_OPC=( '100000' '100000' '100000' '100000' '100000' '100000' '100000' '100000' '100000' '100000' '100000' '100000' '111000' '111001' '110000' '110010' '110011' '111111' '000000' '000001' '000011' '000111' '001111' '011111' )
@@ -170,17 +178,19 @@ INSTRs_FUNC=('110000' '110001' '110010' '110011' '110100' '110101' '110110' '111
 INSTRs_TYPE=('R' 'R' 'R' 'R' 'R' 'R' 'R' 'R' 'R' 'R' 'R' 'R' 'I' 'I' 'I' 'I' 'I' 'J' 'J' 'J' 'I' 'I' 'I' 'I')
 
 #Instructions' 32bit format
-RtypeFormat="<OPC><Rs><Rd><Rt>00000<func>"
-ItypeFormat="<OPC><Rs><Rd><Immediate>"
-JtypeFormat="<OPC><Rs><Rd><Immediate>"
+RtypeFormat="${clRed}<OPC>${clGrn}<Rs>${clOrn}<Rd>${clYel}<Rt>${clEND}00000${clBlu}<func>${clEND}"
+ItypeFormat="${clRed}<OPC>${clGrn}<Rs>${clOrn}<Rd>${clBlu}<Immediate>${clEND}"
+JtypeFormat="${clRed}<OPC>${clGrn}<Rs>${clOrn}<Rd>${clBlu}<Immediate>${clEND}"
 binary=""
+
+
 
 
 while read l;
 do
 	l=${l^^*}				# Instruction capitalized
 	[[ ${l} =~ ^[[:space:]]*$ ]] && echo "00000000000000000000000000000000" && continue
-	idx=$(getINSTRidx $(echo $l | grep -oE "^[^ ]+"))
+	declare -i idx=$(getINSTRidx $(echo $l | grep -oE "^[^ ]+"))
 	
 	if [ ${INSTRs_TYPE[$idx]} = 'R' ];						# The instruction is R-type
 	then
@@ -193,7 +203,17 @@ do
 		binary=$(echo $binary | sed -r "s/<Rd>/${Rd}/")				# Replace <Rd> with instruction's register
 		binary=$(echo $binary | sed -r "s/<Rs>/${Rs}/")				# Replace <Rs> with instruction's register
 		binary=$(echo $binary | sed -r "s/<Rt>/${Rt}/")				# Replace <Rt> with instruction's register
-		echo $binary
+
+		if [[ $l =~ ^[^[:space:]]+[[:space:]]+${Reg_syntax}[[:space:]]*$ ]]; then
+			asmINS="$(echo $l | sed -r "s/^([^[:space:]]+)([[:space:]]+)(${Reg_syntax})/${clRed}\1${clEND}\2${clOrn}\3${clEND}/")"
+		elif [[ $l =~ ^[^[:space:]]+[[:space:]]+${Reg_syntax},[[:space:]]*${Reg_syntax}[[:space:]]*$ ]]; then
+			asmINS="$(echo $l | sed -r "s/^([^[:space:]]+)([[:space:]]+)(${Reg_syntax})(,[[:space:]]*)(${Reg_syntax})/${clRed}\1${clEND}\2${clOrn}\3${clEND}\5${clGrn}\6${clEND}/")"
+		else
+			asmINS="$(echo $l | sed -r "s/^([^[:space:]]+)([[:space:]]+)(${Reg_syntax})(,[[:space:]]*)?(${Reg_syntax})(,[[:space:]]*)?(${Reg_syntax})/${clRed}\1${clEND}\2${clOrn}\3${clEND}\5${clGrn}\6${clEND}\8${clYel}\9${clEND}/")"
+		fi
+
+	        echo -e "$asmINS" 1>&2							# Print the assembly code, colorcoded
+		echo -e "$binary"							# Print the binary code, colorcoded
 	elif [ ${INSTRs_TYPE[$idx]} = 'I' ];						# The instruction is I-type
 	then
 		chkIsyntx "$l" || { echo "*SYNTAX ERROR* : $l" && exit 1; }
@@ -205,7 +225,17 @@ do
 		binary=$(echo $binary | sed -r "s/<Rd>/${Rd}/")				# Replace <Rd> with instruction's register
 		binary=$(echo $binary | sed -r "s/<Rs>/${Rs}/")				# Replace <Rs> with instruction's register
 		binary=$(echo $binary | sed -r "s/<Immediate>/${Immed}/")		# Replace <Immediate> with instruction's immediate
-		echo $binary
+
+		if [[ $l =~ ^[^[:space:]]+[[:space:]]+${Reg_syntax},[[:space:]]*${Reg_syntax},[[:space:]]*${HEX_syntax}[[:space:]]*$ ]]; then
+			asmINS="$(echo $l | sed -r "s/^([^[:space:]]+)([[:space:]]+)(${Reg_syntax})(,[[:space:]]*)(${Reg_syntax})(,[[:space:]]*)(${HEX_syntax})[[:space:]]*$/${clRed}\1${clEND}\2${clOrn}\3${clEND}\5${clGrn}\6${clEND}\8${clBlu}\9${clEND}/")"
+		elif [[ $l =~ ^[^[:space:]]+[[:space:]]+${Reg_syntax},[[:space:]]*${HEX_syntax}[[:space:]]*$ ]]; then
+			asmINS="$(echo $l | sed -r "s/^([^[:space:]]+)([[:space:]]+)(${Reg_syntax})(,[[:space:]]*)(${HEX_syntax})[[:space:]]*$/${clRed}\1${clEND}\2${clOrn}\3${clEND}\5${clBlu}\6${clEND}/")"
+		elif [[ $l =~ ^[^[:space:]]+[[:space:]]+${Reg_syntax},[[:space:]]*${MEMref_syntax}[[:space:]]*$ ]]; then
+			asmINS="$(echo $l | sed -r "s/^([^[:space:]]+)([[:space:]]+)(${Reg_syntax})(,[[:space:]]*)(-?${HEX_syntax})\((${Reg_syntax})\)[[:space:]]*$/${clRed}\1${clEND}\2${clOrn}\3${clEND}\5${clBlu}\6${clEND}(${clGrn}\8${clEND})/")"
+		fi
+
+		echo -e "$asmINS" 1>&2
+		echo -e "$binary"
 	elif [ ${INSTRs_TYPE[$idx]} = 'J' ];						# The instruction is J-type
 	then
 		chkJsyntx "$l" || { echo "*SYNTAX ERROR* : $l" && exit 1; }
@@ -216,9 +246,17 @@ do
 		binary=$(echo $binary | sed -r "s/<Rd>/${Rd}/")				# Replace <Rd> with instruction's register
 		binary=$(echo $binary | sed -r "s/<Rs>/${Rs}/")				# Replace <Rs> with instruction's register
 		binary=$(echo $binary | sed -r "s/<Immediate>/${Immed}/")		# Replace <Immediate> with instruction's immediate
-		echo $binary
+
+		if [[ $l =~ ^[^[:space:]]+[[:space:]]+${HEX_syntax}[[:space:]]*$ ]]; then
+			asmINS="$(echo $l | sed -r "s/^([^[:space:]]+)([[:space:]]+)(${HEX_syntax})[[:space:]]*$/${clRed}\1${clEND}\2${clBlu}\3${clEND}/")"
+		elif [[ $l =~ ^[^[:space:]]+[[:space:]]+${Reg_syntax},[[:space:]]*${Reg_syntax},[[:space:]]*${HEX_syntax}[[:space:]]*$ ]]; then
+			asmINS="$(echo $l | sed -r "s/^([^[:space:]]+)([[:space:]]+)(${Reg_syntax})(,[[:space:]]*)(${Reg_syntax})(,[[:space:]]*)(${HEX_syntax})[[:space:]]*$/${clRed}\1${clEND}\2${clOrn}\3${clEND}\5${clGrn}\6${clEND}\8${clBlu}\9${clEND}/")"
+		fi
+
+		echo -e "$asmINS" 1>&2
+		echo -e "$binary"
 	else
 		echo "Invalid command \"$l\"" && exit 1
 	fi
 #	echo $l
-done < $asblFile
+done < "$asblFile"
