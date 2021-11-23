@@ -3,7 +3,7 @@
 The **MIPS_CHARIS_assembler.sh** is a shell script, written to assemble MIPS instructions to object code. CHARIS is a processor, designed and implemented as project of the _"ACE312 - Computer Organization"_, summer semester course, Technical University of Crete. It is an implementation of a subset from the MIPS instruction set.
 
 
-The bash code is provided with a test file - _"test.mipsasbl"_. You can run it on linux shell with:
+The bash code is provided with a test file - _"test.mipsasm"_. You can run it on linux shell with:
 ``` 
 ./MIPS_CHARIS_assembler.sh test.mipsasm
 ```
